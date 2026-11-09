@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F4F5F7;
+  --foreground: #111827;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  --color-surface-canvas: #F4F5F7;
+  --color-surface-card: #FFFFFF;
+  --color-surface-subtle: #F8F9FA;
+  --color-surface-dark-pill: #18181B;
+  --color-border-subtle: #E5E7EB;
+  --color-border-card: rgba(0, 0, 0, 0.04);
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #9CA3AF;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-studio-1-primary: #2563EB;
+  --color-studio-1-subtle: #EFF6FF;
+  --color-studio-2-primary: #059669;
+  --color-studio-2-subtle: #ECFDF5;
+  --color-brand-accent: #F97316;
+
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 10px 30px -4px rgba(0, 0, 0, 0.06), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
+  --shadow-floating: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
