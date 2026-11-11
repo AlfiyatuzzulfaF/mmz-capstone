@@ -3,6 +3,7 @@
 import { GlobalFilterBar } from '@/components/dashboard/global-filter-bar';
 import { KpiScorecards } from '@/components/dashboard/kpi-scorecards';
 import { OperationalTable } from '@/components/dashboard/operational-table';
+import { WalkinModal } from '@/components/dashboard/walkin-modal';
 import type { BookingFilterParams, BookingListItem, KpiSummary } from '@/types/booking';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [isLoadingKpi, setIsLoadingKpi] = useState(true);
   const [isLoadingBookings, setIsLoadingBookings] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isWalkinModalOpen, setIsWalkinModalOpen] = useState(false);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -103,8 +105,16 @@ export default function HomePage() {
   };
 
   const handleOpenWalkin = () => {
-    // Dipicu oleh tombol "+ Booking Walk-in", akan membuka modal walk-in (Task 10)
-    console.log('Membuka formulir modal Booking Walk-in...');
+    setIsWalkinModalOpen(true);
+  };
+
+  const handleWalkinSuccess = (message: string) => {
+    setNotification({
+      type: 'success',
+      message,
+    });
+    // Trigger revalidasi data jadwal dan KPI
+    handleRefresh();
   };
 
   // Pelunasan kasir dengan pembaruan UI optimistik
@@ -204,6 +214,13 @@ export default function HomePage() {
         onSettlePayment={handleSettlePayment}
         onReschedule={handleReschedule}
         onCancel={handleCancel}
+      />
+
+      {/* 4. Modal Formulir Booking Walk-in Baru (KF-04, KF-09, KF-10) */}
+      <WalkinModal
+        isOpen={isWalkinModalOpen}
+        onClose={() => setIsWalkinModalOpen(false)}
+        onSuccess={handleWalkinSuccess}
       />
     </div>
   );
