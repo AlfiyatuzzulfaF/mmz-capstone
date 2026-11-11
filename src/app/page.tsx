@@ -1,8 +1,10 @@
 'use client';
 
+import { CancelDialog } from '@/components/dashboard/cancel-dialog';
 import { GlobalFilterBar } from '@/components/dashboard/global-filter-bar';
 import { KpiScorecards } from '@/components/dashboard/kpi-scorecards';
 import { OperationalTable } from '@/components/dashboard/operational-table';
+import { RescheduleModal } from '@/components/dashboard/reschedule-modal';
 import { WalkinModal } from '@/components/dashboard/walkin-modal';
 import type { BookingFilterParams, BookingListItem, KpiSummary } from '@/types/booking';
 import { CheckCircle2, XCircle } from 'lucide-react';
@@ -25,7 +27,12 @@ export default function HomePage() {
   const [isLoadingKpi, setIsLoadingKpi] = useState(true);
   const [isLoadingBookings, setIsLoadingBookings] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // State Modal Dialog
   const [isWalkinModalOpen, setIsWalkinModalOpen] = useState(false);
+  const [rescheduleTarget, setRescheduleTarget] = useState<BookingListItem | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<BookingListItem | null>(null);
+
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -113,7 +120,22 @@ export default function HomePage() {
       type: 'success',
       message,
     });
-    // Trigger revalidasi data jadwal dan KPI
+    handleRefresh();
+  };
+
+  const handleRescheduleSuccess = (message: string) => {
+    setNotification({
+      type: 'success',
+      message,
+    });
+    handleRefresh();
+  };
+
+  const handleCancelSuccess = (message: string) => {
+    setNotification({
+      type: 'success',
+      message,
+    });
     handleRefresh();
   };
 
@@ -168,11 +190,11 @@ export default function HomePage() {
   };
 
   const handleReschedule = (booking: BookingListItem) => {
-    console.log('Membuka modal Reschedule untuk booking #', booking.idBooking);
+    setRescheduleTarget(booking);
   };
 
   const handleCancel = (booking: BookingListItem) => {
-    console.log('Membuka dialog pembatalan (soft delete) untuk booking #', booking.idBooking);
+    setCancelTarget(booking);
   };
 
   return (
@@ -221,6 +243,20 @@ export default function HomePage() {
         isOpen={isWalkinModalOpen}
         onClose={() => setIsWalkinModalOpen(false)}
         onSuccess={handleWalkinSuccess}
+      />
+
+      {/* 5. Modal Reschedule Jadwal Pemotretan (PRD 4.4 & Architecture 4.2) */}
+      <RescheduleModal
+        booking={rescheduleTarget}
+        onClose={() => setRescheduleTarget(null)}
+        onSuccess={handleRescheduleSuccess}
+      />
+
+      {/* 6. Dialog Konfirmasi Pembatalan Pemesanan (PRD 4.5 Soft-Delete) */}
+      <CancelDialog
+        booking={cancelTarget}
+        onClose={() => setCancelTarget(null)}
+        onSuccess={handleCancelSuccess}
       />
     </div>
   );
