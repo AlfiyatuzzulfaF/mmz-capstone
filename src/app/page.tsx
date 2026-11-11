@@ -6,6 +6,7 @@ import { CancelDialog } from '@/components/dashboard/cancel-dialog';
 import { GlobalFilterBar } from '@/components/dashboard/global-filter-bar';
 import { KpiScorecards } from '@/components/dashboard/kpi-scorecards';
 import { OperationalTable } from '@/components/dashboard/operational-table';
+import { OwnerInsightCard } from '@/components/dashboard/owner-insight-card';
 import { RescheduleModal } from '@/components/dashboard/reschedule-modal';
 import { WalkinModal } from '@/components/dashboard/walkin-modal';
 import type {
@@ -250,10 +251,27 @@ export default function HomePage() {
       {/* 2. Empat Kartu Metrik Ringkasan Operasional (KPI Scorecards) */}
       <KpiScorecards summary={kpi} isLoading={isLoadingKpi} />
 
-      {/* 3. Grafik Analitik Performa Studio untuk Owner (PRD Bab 5.3) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6">
-        <TopPackagesChart data={topPackages} isLoading={isLoadingAnalytics} />
-        <StudioRatioChart data={studioRatio} isLoading={isLoadingAnalytics} />
+      {/* 3. Baris Analitik Performa Studio & Owner Insight (PRD Bab 5.3 & Design System 5.4) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
+        {/* Kartu Hero Insight Owner Bergradien Sunset-to-Ocean */}
+        <OwnerInsightCard
+          kpi={kpi}
+          topPackages={topPackages}
+          studioRatio={studioRatio}
+          isLoading={isLoadingAnalytics}
+        />
+
+        {/* Grafik Batang Paket Terlaris */}
+        <TopPackagesChart
+          data={topPackages}
+          isLoading={isLoadingAnalytics}
+        />
+
+        {/* Diagram Donat Rasio Utilisasi Studio */}
+        <StudioRatioChart
+          data={studioRatio}
+          isLoading={isLoadingAnalytics}
+        />
       </div>
 
       {/* 4. Tabel Operasional Jadwal Pemotretan (KF-13) */}
