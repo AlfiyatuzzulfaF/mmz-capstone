@@ -1,12 +1,20 @@
 'use client';
 
+import { StudioRatioChart } from '@/components/charts/studio-ratio-chart';
+import { TopPackagesChart } from '@/components/charts/top-packages-chart';
 import { CancelDialog } from '@/components/dashboard/cancel-dialog';
 import { GlobalFilterBar } from '@/components/dashboard/global-filter-bar';
 import { KpiScorecards } from '@/components/dashboard/kpi-scorecards';
 import { OperationalTable } from '@/components/dashboard/operational-table';
 import { RescheduleModal } from '@/components/dashboard/reschedule-modal';
 import { WalkinModal } from '@/components/dashboard/walkin-modal';
-import type { BookingFilterParams, BookingListItem, KpiSummary } from '@/types/booking';
+import type {
+  BookingFilterParams,
+  BookingListItem,
+  KpiSummary,
+  StudioRatioStat,
+  TopPackageStat,
+} from '@/types/booking';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -23,8 +31,12 @@ export default function HomePage() {
     menungguPelunasan: 0,
   });
 
+  const [topPackages, setTopPackages] = useState<TopPackageStat[]>([]);
+  const [studioRatio, setStudioRatio] = useState<StudioRatioStat[]>([]);
   const [bookings, setBookings] = useState<BookingListItem[]>([]);
+
   const [isLoadingKpi, setIsLoadingKpi] = useState(true);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
   const [isLoadingBookings, setIsLoadingBookings] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -38,7 +50,7 @@ export default function HomePage() {
     message: string;
   } | null>(null);
 
-  // Mengambil data analitik KPI dan daftar pemesanan dari backend API
+  // Mengambil data analitik KPI, grafik performa, dan daftar pemesanan dari backend API
   useEffect(() => {
     let isCancelled = false;
 
@@ -57,7 +69,7 @@ export default function HomePage() {
 
         const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
 
-        // Mengambil KPI dan jadwal operasional secara paralel
+        // Mengambil KPI/grafik analitik dan jadwal operasional secara paralel
         const [kpiRes, bookingsRes] = await Promise.all([
           fetch(`/api/analytics${queryString}`),
           fetch(`/api/bookings${queryString}`),
@@ -69,8 +81,16 @@ export default function HomePage() {
         ]);
 
         if (!isCancelled) {
-          if (kpiJson.success && kpiJson.data?.kpi) {
-            setKpi(kpiJson.data.kpi);
+          if (kpiJson.success && kpiJson.data) {
+            if (kpiJson.data.kpi) {
+              setKpi(kpiJson.data.kpi);
+            }
+            if (Array.isArray(kpiJson.data.topPackages)) {
+              setTopPackages(kpiJson.data.topPackages);
+            }
+            if (Array.isArray(kpiJson.data.studioRatio)) {
+              setStudioRatio(kpiJson.data.studioRatio);
+            }
           }
           if (bookingsJson.success && Array.isArray(bookingsJson.data)) {
             setBookings(bookingsJson.data);
@@ -81,6 +101,7 @@ export default function HomePage() {
       } finally {
         if (!isCancelled) {
           setIsLoadingKpi(false);
+          setIsLoadingAnalytics(false);
           setIsLoadingBookings(false);
           setIsRefreshing(false);
         }
@@ -229,7 +250,13 @@ export default function HomePage() {
       {/* 2. Empat Kartu Metrik Ringkasan Operasional (KPI Scorecards) */}
       <KpiScorecards summary={kpi} isLoading={isLoadingKpi} />
 
-      {/* 3. Tabel Operasional Jadwal Pemotretan (KF-13) */}
+      {/* 3. Grafik Analitik Performa Studio untuk Owner (PRD Bab 5.3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6">
+        <TopPackagesChart data={topPackages} isLoading={isLoadingAnalytics} />
+        <StudioRatioChart data={studioRatio} isLoading={isLoadingAnalytics} />
+      </div>
+
+      {/* 4. Tabel Operasional Jadwal Pemotretan (KF-13) */}
       <OperationalTable
         bookings={bookings}
         isLoading={isLoadingBookings}
@@ -238,21 +265,21 @@ export default function HomePage() {
         onCancel={handleCancel}
       />
 
-      {/* 4. Modal Formulir Booking Walk-in Baru (KF-04, KF-09, KF-10) */}
+      {/* 5. Modal Formulir Booking Walk-in Baru (KF-04, KF-09, KF-10) */}
       <WalkinModal
         isOpen={isWalkinModalOpen}
         onClose={() => setIsWalkinModalOpen(false)}
         onSuccess={handleWalkinSuccess}
       />
 
-      {/* 5. Modal Reschedule Jadwal Pemotretan (PRD 4.4 & Architecture 4.2) */}
+      {/* 6. Modal Reschedule Jadwal Pemotretan (PRD 4.4 & Architecture 4.2) */}
       <RescheduleModal
         booking={rescheduleTarget}
         onClose={() => setRescheduleTarget(null)}
         onSuccess={handleRescheduleSuccess}
       />
 
-      {/* 6. Dialog Konfirmasi Pembatalan Pemesanan (PRD 4.5 Soft-Delete) */}
+      {/* 7. Dialog Konfirmasi Pembatalan Pemesanan (PRD 4.5 Soft-Delete) */}
       <CancelDialog
         booking={cancelTarget}
         onClose={() => setCancelTarget(null)}
