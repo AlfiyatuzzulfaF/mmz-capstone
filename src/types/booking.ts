@@ -12,8 +12,14 @@ export type PaymentStatus = 'belum_dibayar' | 'dp_diterima' | 'lunas';
  * - terkonfirmasi: Jadwal sesi foto telah disetujui dan slot kalender terkunci
  * - batal: Pemesanan dibatalkan (soft delete, slot kalender dilepas)
  * - reschedule: Jadwal sesi dipindahkan ke waktu/hari lain
+ * - selesai: Sesi pemotretan telah selesai dilaksanakan
  */
-export type BookingStatus = 'menunggu_dp' | 'terkonfirmasi' | 'batal' | 'reschedule';
+export type BookingStatus =
+  | 'menunggu_dp'
+  | 'terkonfirmasi'
+  | 'batal'
+  | 'reschedule'
+  | 'selesai';
 
 /**
  * Identitas ruangan studio MMZ.

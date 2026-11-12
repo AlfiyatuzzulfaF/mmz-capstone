@@ -98,6 +98,17 @@ export function StatusBadge({ variant, status, className }: StatusBadgeProps) {
           Terkonfirmasi
         </span>
       );
+    case 'selesai':
+      return (
+        <span
+          className={cn(
+            'inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-medium',
+            className
+          )}
+        >
+          Selesai
+        </span>
+      );
     case 'reschedule':
       return (
         <span

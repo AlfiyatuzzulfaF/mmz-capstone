@@ -5,6 +5,7 @@ import {
 } from '@/repositories/analytics.repository';
 import {
   checkSlotConflict,
+  completeBooking as completeBookingRepo,
   getBookingById,
   getBookings,
   insertWalkinBooking,
@@ -250,6 +251,49 @@ export async function settlePayment(
   if (!updated) {
     throw new BookingDomainError(
       'Gagal memperbarui status pelunasan di basis data.',
+      'UPDATE_FAILED',
+      500
+    );
+  }
+
+  return (await getBookingById(idBooking))!;
+}
+
+/**
+ * Menyelesaikan sesi pemotretan (mengubah status booking menjadi 'selesai').
+ *
+ * @param idBooking ID pemesanan
+ * @returns Promise<BookingDetailRow> Data reservasi setelah status menjadi selesai
+ */
+export async function completeBookingSession(
+  idBooking: number
+): Promise<BookingDetailRow> {
+  const booking = await getBookingById(idBooking);
+
+  if (!booking) {
+    throw new BookingDomainError(
+      'Data reservasi tidak ditemukan.',
+      'NOT_FOUND',
+      404
+    );
+  }
+
+  if (booking.status_booking === 'batal') {
+    throw new BookingDomainError(
+      'Pemesanan yang telah dibatalkan tidak dapat ditandai selesai.',
+      'INVALID_STATUS',
+      400
+    );
+  }
+
+  if (booking.status_booking === 'selesai') {
+    return booking;
+  }
+
+  const completed = await completeBookingRepo(idBooking);
+  if (!completed) {
+    throw new BookingDomainError(
+      'Gagal memperbarui status selesai di basis data.',
       'UPDATE_FAILED',
       500
     );

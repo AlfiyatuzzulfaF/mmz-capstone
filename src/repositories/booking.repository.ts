@@ -352,3 +352,20 @@ export async function softDeleteBooking(id: number): Promise<boolean> {
   const [result] = await pool.execute<ResultSetHeader>(sql, [id]);
   return result.affectedRows > 0;
 }
+
+/**
+ * Memperbarui status pemesanan menjadi 'selesai' setelah sesi pemotretan berakhir.
+ *
+ * @param id ID booking yang telah selesai sesi fotonya
+ * @returns Promise<boolean> True jika status berhasil diubah ke 'selesai'
+ */
+export async function completeBooking(id: number): Promise<boolean> {
+  const sql = `
+    UPDATE test.bookings 
+    SET status_booking = 'selesai', updated_at = CURRENT_TIMESTAMP 
+    WHERE id_booking = ?;
+  `;
+
+  const [result] = await pool.execute<ResultSetHeader>(sql, [id]);
+  return result.affectedRows > 0;
+}

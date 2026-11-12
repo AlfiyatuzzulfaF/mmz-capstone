@@ -335,7 +335,7 @@ export function GlobalFilterBar({
           className="flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium shadow-sm transition-all ml-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>+ Booking Walk-in</span>
+          <span>Booking Walk-in</span>
         </button>
       </div>
     </div>

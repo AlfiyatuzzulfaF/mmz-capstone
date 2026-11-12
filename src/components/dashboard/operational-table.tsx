@@ -7,6 +7,7 @@ import { normalizeIndonesianPhone } from '@/validations/booking.schema';
 import {
   Calendar,
   CalendarX2,
+  Camera,
   Check,
   Loader2,
   MessageCircle,
@@ -19,6 +20,7 @@ export interface OperationalTableProps {
   bookings: BookingListItem[];
   isLoading?: boolean;
   onSettlePayment?: (idBooking: number) => Promise<void>;
+  onCompleteSession?: (idBooking: number) => Promise<void>;
   onReschedule?: (booking: BookingListItem) => void;
   onCancel?: (booking: BookingListItem) => void;
 }
@@ -27,11 +29,13 @@ export function OperationalTable({
   bookings,
   isLoading = false,
   onSettlePayment,
+  onCompleteSession,
   onReschedule,
   onCancel,
 }: OperationalTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [settlingIds, setSettlingIds] = useState<Record<number, boolean>>({});
+  const [completingIds, setCompletingIds] = useState<Record<number, boolean>>({});
 
   // Filter client-side berdasarkan pencarian nama pelanggan, paket, atau nomor whatsapp
   const filteredBookings = useMemo(() => {
@@ -53,6 +57,20 @@ export function OperationalTable({
       await onSettlePayment(idBooking);
     } finally {
       setSettlingIds((prev) => {
+        const next = { ...prev };
+        delete next[idBooking];
+        return next;
+      });
+    }
+  };
+
+  const handleComplete = async (idBooking: number) => {
+    if (!onCompleteSession || completingIds[idBooking]) return;
+    try {
+      setCompletingIds((prev) => ({ ...prev, [idBooking]: true }));
+      await onCompleteSession(idBooking);
+    } finally {
+      setCompletingIds((prev) => {
         const next = { ...prev };
         delete next[idBooking];
         return next;
@@ -163,8 +181,10 @@ export function OperationalTable({
               // Booking Rows
               filteredBookings.map((booking) => {
                 const isSettling = settlingIds[booking.idBooking];
+                const isCompleting = completingIds[booking.idBooking];
                 const isPaid = booking.statusPembayaran === 'lunas';
                 const isCanceled = booking.statusBooking === 'batal';
+                const isCompleted = booking.statusBooking === 'selesai';
                 const waPhone = normalizeIndonesianPhone(booking.noWhatsapp);
                 const waLink = `https://wa.me/${waPhone}`;
 
@@ -249,11 +269,33 @@ export function OperationalTable({
                           </button>
                         )}
 
+                        {/* Tombol Selesai Sesi */}
+                        {!isCompleted && !isCanceled && (
+                          <button
+                            type="button"
+                            title="Tandai Sesi Foto Selesai"
+                            onClick={() => handleComplete(booking.idBooking)}
+                            disabled={isCompleting}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-medium transition-all shadow-sm disabled:opacity-60"
+                          >
+                            {isCompleting ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <Camera className="w-3 h-3" />
+                            )}
+                            <span>Selesai Sesi</span>
+                          </button>
+                        )}
+
                         {/* Tombol Reschedule */}
                         <button
                           type="button"
-                          title={isCanceled ? 'Pemesanan telah dibatalkan' : 'Reschedule Jadwal'}
-                          disabled={isCanceled}
+                          title={
+                            isCanceled || isCompleted
+                              ? 'Pemesanan tidak dapat diatur ulang'
+                              : 'Reschedule Jadwal'
+                          }
+                          disabled={isCanceled || isCompleted}
                           onClick={() => onReschedule?.(booking)}
                           className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors disabled:opacity-30 disabled:pointer-events-none"
                         >
@@ -263,8 +305,12 @@ export function OperationalTable({
                         {/* Tombol Batalkan (Soft Delete) */}
                         <button
                           type="button"
-                          title={isCanceled ? 'Pemesanan telah dibatalkan' : 'Batalkan Booking'}
-                          disabled={isCanceled}
+                          title={
+                            isCanceled || isCompleted
+                              ? 'Pemesanan tidak dapat dibatalkan'
+                              : 'Batalkan Booking'
+                          }
+                          disabled={isCanceled || isCompleted}
                           onClick={() => onCancel?.(booking)}
                           className="p-1.5 rounded-full text-neutral-400 hover:text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-30 disabled:pointer-events-none"
                         >

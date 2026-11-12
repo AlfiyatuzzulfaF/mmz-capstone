@@ -1,10 +1,11 @@
 'use client';
 
+import { NavTabId, useNavigation } from '@/context/navigation-context';
 import { Bell, Search } from 'lucide-react';
-import { useState } from 'react';
+import React from 'react';
 
 export interface NavTabItem {
-  id: string;
+  id: NavTabId;
   label: string;
   href?: string;
 }
@@ -22,7 +23,7 @@ const NAV_TABS: NavTabItem[] = [
  * Mengadopsi prinsip Anti-UI-Slop, elevated light backdrop blur, dan active dark pill tabs.
  */
 export function Topbar() {
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  const { activeTab, setActiveTab } = useNavigation();
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-neutral-200/60 bg-white/80 backdrop-blur-md transition-colors">

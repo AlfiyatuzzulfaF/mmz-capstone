@@ -125,7 +125,10 @@ ON DUPLICATE KEY UPDATE
 INSERT INTO `paket_layanan` (`id_paket`, `nama_paket`, `durasi_menit`, `harga`, `status_aktif`) VALUES
   (1, 'Self-Photo Basic', 30, 80000.00, 1),
   (2, 'Reguler Portrait', 45, 150000.00, 1),
-  (3, 'Graduation Deluxe', 60, 250000.00, 1)
+  (3, 'Graduation Deluxe', 60, 250000.00, 1),
+  (4, 'Wedding Documentation', 180, 2500000.00, 1),
+  (5, 'Prewedding Studio', 120, 1200000.00, 1),
+  (6, 'Engagement / Lamaran', 90, 850000.00, 1)
 ON DUPLICATE KEY UPDATE
   `nama_paket` = VALUES(`nama_paket`),
   `durasi_menit` = VALUES(`durasi_menit`),

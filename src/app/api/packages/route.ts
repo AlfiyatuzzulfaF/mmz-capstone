@@ -28,6 +28,27 @@ const FALLBACK_PACKAGES: Array<Omit<PaketLayananRow, 'status_aktif'> & { status_
     harga: 250000,
     status_aktif: 1,
   },
+  {
+    id_paket: 4,
+    nama_paket: 'Wedding Documentation',
+    durasi_menit: 180,
+    harga: 2500000,
+    status_aktif: 1,
+  },
+  {
+    id_paket: 5,
+    nama_paket: 'Prewedding Studio',
+    durasi_menit: 120,
+    harga: 1200000,
+    status_aktif: 1,
+  },
+  {
+    id_paket: 6,
+    nama_paket: 'Engagement / Lamaran',
+    durasi_menit: 90,
+    harga: 850000,
+    status_aktif: 1,
+  },
 ];
 
 /**

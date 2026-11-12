@@ -71,20 +71,20 @@ export function TopPackagesChart({ data, isLoading = false }: TopPackagesChartPr
 
             return (
               <div key={item.namaPaket || index} className="space-y-1.5 group">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5 font-medium text-neutral-800">
-                    <span className="w-4 text-neutral-400 font-mono text-[11px]">
+                <div className="flex items-center justify-between text-xs gap-2">
+                  <div className="flex items-center gap-1.5 font-medium text-neutral-800 min-w-0">
+                    <span className="w-4 text-neutral-400 font-mono text-[11px] shrink-0">
                       #{index + 1}
                     </span>
-                    <span className="truncate max-w-[180px] sm:max-w-[240px]">
+                    <span className="truncate">
                       {item.namaPaket}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-neutral-500 font-mono text-[11px]">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-neutral-500 font-mono text-[11px] whitespace-nowrap">
                       {item.totalTerjual} sesi
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 text-[10px] font-semibold">
+                    <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 text-[10px] font-semibold whitespace-nowrap">
                       {percentage}%
                     </span>
                   </div>

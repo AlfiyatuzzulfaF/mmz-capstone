@@ -3,12 +3,16 @@
 import { StudioRatioChart } from '@/components/charts/studio-ratio-chart';
 import { TopPackagesChart } from '@/components/charts/top-packages-chart';
 import { CancelDialog } from '@/components/dashboard/cancel-dialog';
+import { CustomersView } from '@/components/dashboard/customers-view';
+import { FinancialView } from '@/components/dashboard/financial-view';
 import { GlobalFilterBar } from '@/components/dashboard/global-filter-bar';
 import { KpiScorecards } from '@/components/dashboard/kpi-scorecards';
 import { OperationalTable } from '@/components/dashboard/operational-table';
 import { OwnerInsightCard } from '@/components/dashboard/owner-insight-card';
+import { PackagesView } from '@/components/dashboard/packages-view';
 import { RescheduleModal } from '@/components/dashboard/reschedule-modal';
 import { WalkinModal } from '@/components/dashboard/walkin-modal';
+import { useNavigation } from '@/context/navigation-context';
 import type {
   BookingFilterParams,
   BookingListItem,
@@ -20,6 +24,8 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function HomePage() {
+  const { activeTab } = useNavigation();
+
   const [filters, setFilters] = useState<BookingFilterParams>({
     studioId: 'all',
     paymentStatus: 'all',
@@ -211,6 +217,47 @@ export default function HomePage() {
     }
   };
 
+  // Menandai sesi foto telah selesai (status_booking = 'selesai')
+  const handleCompleteSession = async (idBooking: number) => {
+    const previousBookings = [...bookings];
+
+    setBookings((prev) =>
+      prev.map((item) =>
+        item.idBooking === idBooking
+          ? { ...item, statusBooking: 'selesai' }
+          : item
+      )
+    );
+
+    try {
+      const response = await fetch(`/api/bookings/${idBooking}/complete`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Gagal menandai sesi foto selesai.');
+      }
+
+      setNotification({
+        type: 'success',
+        message: `Sesi foto reservasi #${idBooking} telah berhasil diselesaikan.`,
+      });
+    } catch (error: unknown) {
+      setBookings(previousBookings);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Terjadi kendala saat menyelesaikan sesi foto.';
+      setNotification({
+        type: 'error',
+        message: errorMessage,
+      });
+    }
+  };
+
   const handleReschedule = (booking: BookingListItem) => {
     setRescheduleTarget(booking);
   };
@@ -239,65 +286,118 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 1. Kontrol Filter Global Bar */}
-      <GlobalFilterBar
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onRefresh={handleRefresh}
-        onOpenWalkinModal={handleOpenWalkin}
-        isRefreshing={isRefreshing}
-      />
+      {/* Tampilan Dinamis Berdasarkan Tab Aktif */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Kontrol Filter Global Bar */}
+          <GlobalFilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onRefresh={handleRefresh}
+            onOpenWalkinModal={handleOpenWalkin}
+            isRefreshing={isRefreshing}
+          />
 
-      {/* 2. Empat Kartu Metrik Ringkasan Operasional (KPI Scorecards) */}
-      <KpiScorecards summary={kpi} isLoading={isLoadingKpi} />
+          {/* 4 Kartu Metrik Ringkasan Operasional (KPI Scorecards) */}
+          <KpiScorecards summary={kpi} isLoading={isLoadingKpi} />
 
-      {/* 3. Baris Analitik Performa Studio & Owner Insight (PRD Bab 5.3 & Design System 5.4) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
-        {/* Kartu Hero Insight Owner Bergradien Sunset-to-Ocean */}
-        <OwnerInsightCard
-          kpi={kpi}
-          topPackages={topPackages}
-          studioRatio={studioRatio}
-          isLoading={isLoadingAnalytics}
+          {/* Baris Analitik Performa Studio & Owner Insight */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
+            <OwnerInsightCard
+              kpi={kpi}
+              topPackages={topPackages}
+              studioRatio={studioRatio}
+              isLoading={isLoadingAnalytics}
+            />
+            <TopPackagesChart
+              data={topPackages}
+              isLoading={isLoadingAnalytics}
+            />
+            <StudioRatioChart
+              data={studioRatio}
+              isLoading={isLoadingAnalytics}
+            />
+          </div>
+
+          {/* Tabel Operasional Jadwal Pemotretan */}
+          <OperationalTable
+            bookings={bookings}
+            isLoading={isLoadingBookings}
+            onSettlePayment={handleSettlePayment}
+            onCompleteSession={handleCompleteSession}
+            onReschedule={handleReschedule}
+            onCancel={handleCancel}
+          />
+        </>
+      )}
+
+      {activeTab === 'jadwal' && (
+        <>
+          {/* Filter Bar Fokus Jadwal Operasional */}
+          <GlobalFilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onRefresh={handleRefresh}
+            onOpenWalkinModal={handleOpenWalkin}
+            isRefreshing={isRefreshing}
+          />
+
+          {/* Tabel Operasional Jadwal Penuh */}
+          <OperationalTable
+            bookings={bookings}
+            isLoading={isLoadingBookings}
+            onSettlePayment={handleSettlePayment}
+            onCompleteSession={handleCompleteSession}
+            onReschedule={handleReschedule}
+            onCancel={handleCancel}
+          />
+        </>
+      )}
+
+      {activeTab === 'pelanggan' && (
+        <CustomersView
+          bookings={bookings}
+          onOpenWalkinModal={handleOpenWalkin}
         />
+      )}
 
-        {/* Grafik Batang Paket Terlaris */}
-        <TopPackagesChart
-          data={topPackages}
-          isLoading={isLoadingAnalytics}
-        />
+      {activeTab === 'paket' && (
+        <PackagesView onOpenWalkinModal={handleOpenWalkin} />
+      )}
 
-        {/* Diagram Donat Rasio Utilisasi Studio */}
-        <StudioRatioChart
-          data={studioRatio}
-          isLoading={isLoadingAnalytics}
-        />
-      </div>
+      {activeTab === 'keuangan' && (
+        <>
+          <GlobalFilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onRefresh={handleRefresh}
+            onOpenWalkinModal={handleOpenWalkin}
+            isRefreshing={isRefreshing}
+          />
+          <FinancialView
+            kpi={kpi}
+            topPackages={topPackages}
+            studioRatio={studioRatio}
+            bookings={bookings}
+            isLoadingAnalytics={isLoadingAnalytics}
+            onSettlePayment={handleSettlePayment}
+          />
+        </>
+      )}
 
-      {/* 4. Tabel Operasional Jadwal Pemotretan (KF-13) */}
-      <OperationalTable
-        bookings={bookings}
-        isLoading={isLoadingBookings}
-        onSettlePayment={handleSettlePayment}
-        onReschedule={handleReschedule}
-        onCancel={handleCancel}
-      />
-
-      {/* 5. Modal Formulir Booking Walk-in Baru (KF-04, KF-09, KF-10) */}
+      {/* Modal Dialogs (Tersedia Global di Seluruh Tab) */}
       <WalkinModal
         isOpen={isWalkinModalOpen}
         onClose={() => setIsWalkinModalOpen(false)}
         onSuccess={handleWalkinSuccess}
       />
 
-      {/* 6. Modal Reschedule Jadwal Pemotretan (PRD 4.4 & Architecture 4.2) */}
       <RescheduleModal
         booking={rescheduleTarget}
         onClose={() => setRescheduleTarget(null)}
         onSuccess={handleRescheduleSuccess}
       />
 
-      {/* 7. Dialog Konfirmasi Pembatalan Pemesanan (PRD 4.5 Soft-Delete) */}
       <CancelDialog
         booking={cancelTarget}
         onClose={() => setCancelTarget(null)}

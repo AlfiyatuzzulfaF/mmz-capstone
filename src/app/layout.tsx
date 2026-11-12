@@ -1,4 +1,5 @@
 import { Topbar } from '@/components/layout/topbar';
+import { NavigationProvider } from '@/context/navigation-context';
 import type { Metadata } from 'next';
 import './globals.css';
 
@@ -16,13 +17,15 @@ export default function RootLayout({
   return (
     <html lang="id" className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-[#F4F5F7] text-neutral-900 selection:bg-orange-500 selection:text-white">
-        {/* Header Navigasi Kapsul Zentra */}
-        <Topbar />
+        <NavigationProvider>
+          {/* Header Navigasi Kapsul Zentra */}
+          <Topbar />
 
-        {/* Kontainer Utama Aplikasi */}
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 py-6 sm:py-8">
-          {children}
-        </main>
+          {/* Kontainer Utama Aplikasi */}
+          <main className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 py-6 sm:py-8">
+            {children}
+          </main>
+        </NavigationProvider>
       </body>
     </html>
   );

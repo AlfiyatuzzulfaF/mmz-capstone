@@ -61,11 +61,11 @@ export function StudioRatioChart({ data, isLoading = false }: StudioRatioChartPr
       <div className="my-auto py-2">
         {isLoading ? (
           // Loading Skeleton
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-pulse py-4">
+          <div className="flex flex-col items-center justify-center gap-4 animate-pulse py-2">
             <div className="w-36 h-36 rounded-full bg-neutral-100" />
-            <div className="space-y-3 w-full sm:w-44">
-              <div className="h-9 w-full bg-neutral-100 rounded-full" />
-              <div className="h-9 w-full bg-neutral-100 rounded-full" />
+            <div className="space-y-2 w-full">
+              <div className="h-9 w-full bg-neutral-100 rounded-2xl" />
+              <div className="h-9 w-full bg-neutral-100 rounded-2xl" />
             </div>
           </div>
         ) : totalSessions === 0 ? (
@@ -82,9 +82,9 @@ export function StudioRatioChart({ data, isLoading = false }: StudioRatioChartPr
             </p>
           </div>
         ) : (
-          // Diagram Donat SVG Responsif
-          <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
-            <div className="relative w-40 h-40 flex items-center justify-center shrink-0">
+          // Diagram Donat SVG Responsif Terpusat & Legend Penuh di Bawah (Anti-Offside)
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
               <svg viewBox="0 0 160 160" className="w-full h-full transform -rotate-90">
                 {/* Latar Belakang Track */}
                 <circle
@@ -136,33 +136,33 @@ export function StudioRatioChart({ data, isLoading = false }: StudioRatioChartPr
               </div>
             </div>
 
-            {/* Pill Legend Kontrol */}
-            <div className="space-y-2.5 w-full sm:w-auto">
+            {/* Pill Legend Kontrol Lebar Penuh (Anti-Offside & Anti-Word Wrap) */}
+            <div className="space-y-2 w-full">
               {/* Studio 1 Pill */}
-              <div className="flex items-center justify-between sm:justify-start gap-3 px-3.5 py-2 rounded-2xl bg-blue-50/80 border border-blue-200/70 text-xs">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl bg-blue-50/80 border border-blue-200/70 text-xs">
+                <div className="flex items-center gap-2 min-w-0">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
-                  <span className="font-semibold text-blue-900">Studio 1</span>
-                  <span className="text-blue-600/70 text-[11px]">(Reguler)</span>
+                  <span className="font-semibold text-blue-900 whitespace-nowrap">Studio 1</span>
+                  <span className="text-blue-600/80 text-[11px] whitespace-nowrap">(Reguler)</span>
                 </div>
-                <div className="flex items-center gap-1.5 ml-auto pl-2 font-mono">
-                  <span className="font-semibold text-blue-900">{studio1.totalSesi} sesi</span>
-                  <span className="px-1.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                <div className="flex items-center gap-2 shrink-0 font-mono">
+                  <span className="font-semibold text-blue-900 whitespace-nowrap">{studio1.totalSesi} sesi</span>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold shrink-0">
                     {pct1}%
                   </span>
                 </div>
               </div>
 
               {/* Studio 2 Pill */}
-              <div className="flex items-center justify-between sm:justify-start gap-3 px-3.5 py-2 rounded-2xl bg-emerald-50/80 border border-emerald-200/70 text-xs">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/70 text-xs">
+                <div className="flex items-center gap-2 min-w-0">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0" />
-                  <span className="font-semibold text-emerald-900">Studio 2</span>
-                  <span className="text-emerald-600/70 text-[11px]">(Self-Photo)</span>
+                  <span className="font-semibold text-emerald-900 whitespace-nowrap">Studio 2</span>
+                  <span className="text-emerald-600/80 text-[11px] whitespace-nowrap">(Self-Photo)</span>
                 </div>
-                <div className="flex items-center gap-1.5 ml-auto pl-2 font-mono">
-                  <span className="font-semibold text-emerald-900">{studio2.totalSesi} sesi</span>
-                  <span className="px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold">
+                <div className="flex items-center gap-2 shrink-0 font-mono">
+                  <span className="font-semibold text-emerald-900 whitespace-nowrap">{studio2.totalSesi} sesi</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold shrink-0">
                     {pct2}%
                   </span>
                 </div>
